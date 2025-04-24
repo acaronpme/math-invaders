@@ -437,17 +437,26 @@
             createExplosion();
             
             // Show positive feedback
-            function showFeedback(message) {
+            function showFeedback(message, isEquation = false) {
                 const feedbackElement = document.createElement('div');
                 feedbackElement.className = 'feedback-message';
-                feedbackElement.innerHTML = message.replace(/\n/g, '<br>'); // permet les sauts de ligne
+            
+                // Si c'est une équation à afficher, on applique un format spécial
+                if (isEquation) {
+                    const [line1, line2] = message.split('\n');
+                    feedbackElement.innerHTML = `
+                        <div style="font-size: 24px; font-weight: bold;">${line1}</div>
+                        <div style="font-size: 32px; color: #ffffff;">${line2}</div>
+                    `;
+                } else {
+                    feedbackElement.textContent = message;
+                }
             
                 elements.feedbackContainer.appendChild(feedbackElement);
             
-                // Supprime le message après 4 secondes (4000 ms)
                 setTimeout(() => {
                     feedbackElement.remove();
-                }, 4000);
+                }, 4000); // reste 4 secondes
             }
         }
 
@@ -466,7 +475,7 @@
             
             // Show feedback
             const correctEquation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
-            showFeedback(`ESSAYEZ ENCORE !\n${correctEquation}`);
+            showFeedback(`ESSAYEZ ENCORE !\n${correctEquation}`, true);
             
             // Generate new problem after a short delay
             setTimeout(() => {
