@@ -315,59 +315,87 @@
 
         // Generate a new multiplication problem
         function generateNewProblem() {
-            // Clear any existing invader
-            if (gameState.invaderElement) {
-                gameState.invaderElement.remove();
-            }
-            
-            // Generate multiplication problem (a × b) without 1
-            const a = Math.floor(Math.random() * 8) + 2; // 2-9
-            const b = Math.floor(Math.random() * 11) + 2; // 2-12
-            gameState.currentProblem = `${a} × ${b}`;
-            gameState.currentAnswer = a * b;
-            
-            // Create and position the spaceship
-            gameState.invaderElement = document.createElement('div');
-            gameState.invaderElement.className = 'invader';
-            gameState.invaderElement.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
-            gameState.invaderElement.style.top = '0px';
-            
-            // Create spaceship structure
-            const spaceship = document.createElement('div');
-            spaceship.className = 'spaceship-body';
-            
-            // Add cockpit with the math problem
-            const cockpit = document.createElement('div');
-            cockpit.className = 'spaceship-cockpit';
-            cockpit.textContent = gameState.currentProblem;
-            spaceship.appendChild(cockpit);
-            
-            // Add wings
-            const wings = document.createElement('div');
-            wings.className = 'spaceship-wings';
-            
-            const wingLeft = document.createElement('div');
-            wingLeft.className = 'wing wing-left';
-            
-            const wingRight = document.createElement('div');
-            wingRight.className = 'wing wing-right';
-            
-            wings.appendChild(wingLeft);
-            wings.appendChild(wingRight);
-            spaceship.appendChild(wings);
-            
-            // Add engine
-            const engine = document.createElement('div');
-            engine.className = 'spaceship-engine';
-            spaceship.appendChild(engine);
-            
-            gameState.invaderElement.appendChild(spaceship);
-            elements.invaderContainer.appendChild(gameState.invaderElement);
-            gameState.invaderPosition = 0;
-            
-            // Reset timer
-            gameState.timeLeft = gameState.maxTime;
-            updateTimerDisplay();
+          // Supprimer l'ancien invader
+          if (gameState.invaderElement) {
+            gameState.invaderElement.remove();
+            gameState.invaderElement = null;
+          }
+        
+          let a, b;
+        
+          if (selectedTable !== "all") {
+            a = parseInt(selectedTable);
+            b = Math.floor(Math.random() * 12) + 1;
+          } else {
+            a = Math.floor(Math.random() * 9) + 2;
+            b = Math.floor(Math.random() * 12) + 1;
+          }
+        
+          let problem, answer;
+          switch (selectedOperation) {
+            case "multiplication":
+              problem = `${a} × ${b}`;
+              answer = a * b;
+              break;
+            case "addition":
+              problem = `${a} + ${b}`;
+              answer = a + b;
+              break;
+            case "soustraction":
+              if (b > a) [a, b] = [b, a];
+              problem = `${a} − ${b}`;
+              answer = a - b;
+              break;
+            case "division":
+              answer = a;
+              b = Math.floor(Math.random() * 9) + 2;
+              a = a * b;
+              problem = `${a} ÷ ${b}`;
+              break;
+          }
+        
+          gameState.currentProblem = problem;
+          gameState.currentAnswer = answer;
+        
+          // Création de l'invader (comme dans le jeu original)
+          const invader = document.createElement("div");
+          invader.className = "invader";
+          invader.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
+          invader.style.top = "0px";
+        
+          const spaceship = document.createElement("div");
+          spaceship.className = "spaceship-body";
+        
+          const cockpit = document.createElement("div");
+          cockpit.className = "spaceship-cockpit";
+          cockpit.textContent = problem;
+          spaceship.appendChild(cockpit);
+        
+          const wings = document.createElement("div");
+          wings.className = "spaceship-wings";
+        
+          const wingLeft = document.createElement("div");
+          wingLeft.className = "wing wing-left";
+        
+          const wingRight = document.createElement("div");
+          wingRight.className = "wing wing-right";
+        
+          wings.appendChild(wingLeft);
+          wings.appendChild(wingRight);
+          spaceship.appendChild(wings);
+        
+          const engine = document.createElement("div");
+          engine.className = "spaceship-engine";
+          spaceship.appendChild(engine);
+        
+          invader.appendChild(spaceship);
+          elements.invaderContainer.appendChild(invader);
+        
+          gameState.invaderElement = invader;
+          gameState.invaderPosition = 0;
+        
+          gameState.timeLeft = gameState.maxTime;
+          updateTimerDisplay();
         }
 
         // Start the timer for the current problem
