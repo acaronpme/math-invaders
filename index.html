@@ -437,26 +437,26 @@
             createExplosion();
             
             // Show positive feedback
-            function showFeedback(message, isEquation = false) {
+            function showFeedback(mainMessage, equation = null) {
                 const feedbackElement = document.createElement('div');
                 feedbackElement.className = 'feedback-message';
             
-                // Si c'est une équation à afficher, on applique un format spécial
-                if (isEquation) {
-                    const [line1, line2] = message.split('\n');
+                if (equation) {
                     feedbackElement.innerHTML = `
-                        <div style="font-size: 24px; font-weight: bold;">${line1}</div>
-                        <div style="font-size: 32px; color: #ffffff;">${line2}</div>
+                        <div>${mainMessage}</div>
+                        <div style="font-size: 32px; font-weight: bold; color: #ffffff; text-shadow: 0 0 10px #00ff00;">
+                            ${equation}
+                        </div>
                     `;
                 } else {
-                    feedbackElement.textContent = message;
+                    feedbackElement.textContent = mainMessage;
                 }
             
                 elements.feedbackContainer.appendChild(feedbackElement);
             
                 setTimeout(() => {
                     feedbackElement.remove();
-                }, 4000); // reste 4 secondes
+                }, 6000); // 6 seconds
             }
         }
 
@@ -474,8 +474,8 @@
             }
             
             // Show feedback
-            const correctEquation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
-            showFeedback(`ESSAYEZ ENCORE !\n${correctEquation}`, true);
+            const equation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
+            showFeedback("ESSAYEZ ENCORE !", equation);
             
             // Generate new problem after a short delay
             setTimeout(() => {
