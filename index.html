@@ -23,7 +23,7 @@
             position: relative;
             width: 100%;
             max-width: 1000px;
-            height: 400px; /* Reduced height for laptop screens */
+            height: 400px;
             margin: 0 auto;
             border: 4px solid #00ff00;
             background-color: #000;
@@ -32,7 +32,7 @@
         
         .invader {
             position: absolute;
-            width: 250px; /* Wider ship */
+            width: 250px;
             height: 80px;
             background-size: contain;
             background-repeat: no-repeat;
@@ -47,13 +47,13 @@
             border-radius: 50% 50% 20% 20%;
             position: relative;
             display: flex;
-            flex-direction: row; /* Horizontal layout */
+            flex-direction: row;
             align-items: center;
             justify-content: center;
         }
         
         .spaceship-cockpit {
-            width: 70%; /* Wider cockpit */
+            width: 70%;
             height: 50%;
             background-color: #66aaff;
             border-radius: 50%;
@@ -153,12 +153,59 @@
             color: #ffff00;
             text-shadow: 0 0 5px #ff0000;
         }
+        
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .settings-panel.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .settings-content {
+            background-color: #111;
+            border: 4px solid #00ff00;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .table-btn {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        .operation-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        .selected {
+            background-color: #00ff00 !important;
+            color: #000 !important;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center p-4">
     <div class="text-center mb-4">
         <h1 class="text-2xl md:text-3xl retro-text mb-2">ENVAHISSEURS MATHÉMATIQUES</h1>
-        <p class="text-lg retro-text">Détruisez les vaisseaux en résolvant des multiplications !</p>
+        <p class="text-lg retro-text">Détruisez les vaisseaux en résolvant des calculs !</p>
     </div>
     
     <div class="game-container pixel-border relative">
@@ -176,6 +223,7 @@
                 <input id="answer-input" type="text" class="flex-1 px-4 py-2 bg-black text-green-500 border-2 border-green-500 focus:outline-none focus:border-yellow-500" placeholder="Tapez la réponse ici..." autocomplete="off">
                 <button id="submit-btn" class="ml-2 px-4 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">TIREZ !</button>
                 <button id="stop-btn" class="ml-2 px-4 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 hidden">ARRÊTER</button>
+                <button id="settings-btn" class="ml-2 px-4 py-2 bg-purple-900 text-white border-2 border-purple-500 hover:bg-purple-800">PARAMÈTRES</button>
             </div>
         </div>
     </div>
@@ -197,31 +245,70 @@
         </div>
     </div>
     
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-content pixel-border">
+            <h2 class="text-2xl text-green-500 mb-6 text-center">PARAMÈTRES DU JEU</h2>
+            
+            <div class="mb-8">
+                <h3 class="text-lg text-yellow-500 mb-4">Choisissez la table:</h3>
+                <div class="flex flex-wrap justify-center">
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="1">1</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="2">2</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="3">3</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="4">4</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="5">5</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="6">6</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="7">7</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="8">8</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="9">9</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="10">10</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="11">11</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-table="12">12</button>
+                    <button class="table-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700 selected" data-table="all">Toutes</button>
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <h3 class="text-lg text-yellow-500 mb-4">Choisissez l'opération:</h3>
+                <div class="flex flex-wrap justify-center">
+                    <button class="operation-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700 selected" data-operation="multiplication">×</button>
+                    <button class="operation-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-operation="addition">+</button>
+                    <button class="operation-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-operation="soustraction">−</button>
+                    <button class="operation-btn bg-gray-800 text-white border-2 border-green-500 hover:bg-gray-700" data-operation="division">÷</button>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <button id="save-settings-btn" class="px-6 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">ENREGISTRER</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="mt-6 text-center">
         <button id="start-btn" class="px-8 py-3 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 retro-text">COMMENCER</button>
     </div>
     
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-    <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
-        <h3 class="text-yellow-500 mb-2 text-base">Points</h3>
-        <p class="text-xs">0-3 sec: 10 pts</p>
-        <p class="text-xs">3-6 sec: 7 pts</p>
-        <p class="text-xs">6-10 sec: 5 pts</p>
-        <p class="text-xs">10+ sec: 0 pts</p>
+        <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
+            <h3 class="text-yellow-500 mb-2 text-base">Points</h3>
+            <p class="text-xs">0-3 sec: 10 pts</p>
+            <p class="text-xs">3-6 sec: 7 pts</p>
+            <p class="text-xs">6-10 sec: 5 pts</p>
+            <p class="text-xs">10+ sec: 0 pts</p>
+        </div>
+        <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
+            <h3 class="text-yellow-500 mb-2 text-base">Bonus Combo</h3>
+            <p class="text-xs">+5 pts tous les</p>
+            <p class="text-xs">3 bonnes</p>
+            <p class="text-xs">réponses</p>
+        </div>
+        <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
+            <h3 class="text-yellow-500 mb-2 text-base">Contrôles</h3>
+            <p class="text-xs">Tapez la réponse</p>
+            <p class="text-xs">Appuyez sur ENTREZ</p>
+            <p class="text-xs">ou cliquez TIREZ!</p>
+        </div>
     </div>
-    <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
-        <h3 class="text-yellow-500 mb-2 text-base">Bonus Combo</h3>
-        <p class="text-xs">+5 pts tous les</p>
-        <p class="text-xs">3 bonnes</p>
-        <p class="text-xs">réponses</p>
-    </div>
-    <div class="p-4 bg-gray-900 border-2 border-green-500 w-full h-42 md:h-38 lg:h-32">
-        <h3 class="text-yellow-500 mb-2 text-base">Contrôles</h3>
-        <p class="text-xs">Tapez la réponse</p>
-        <p class="text-xs">Appuyez sur ENTREZ</p>
-        <p class="text-xs">ou cliquez TIREZ!</p>
-    </div>
-</div>
 
     <script>
         // Game state
@@ -237,11 +324,13 @@
             timerInterval: null,
             invaderSpeed: 2,
             invaderPosition: 0,
-            maxInvaderPosition: 320, // 400px container height - 80px invader height
+            maxInvaderPosition: 320,
             invaderElement: null,
             explosionElement: null,
-            gameDuration: 120000, // 2 minutes
-            gameTimeout: null
+            gameDuration: 120000,
+            gameTimeout: null,
+            selectedTable: "all",
+            selectedOperation: "multiplication"
         };
 
         // DOM elements
@@ -260,26 +349,12 @@
             finalScore: document.getElementById('final-score'),
             playAgainBtn: document.getElementById('play-again-btn'),
             scoreForm: document.getElementById('score-form'),
-            playerName: document.getElementById('player-name')
-        };
-
-        // Positive feedback messages in French
-        const feedbackMessages = [
-            "SUPER !",
-            "GÉNIAL !",
-            "BIEN JOUÉ !",
-            "EXCELLENT !",
-            "PARFAIT !",
-            "FORMIDABLE !",
-            "BRAVO !",
-            "INCROYABLE !",
-            "FANTASTIQUE !",
-            "TOP !"
-        ];
-
-        // Sound effects
-        const soundEffects = {
-            explosion: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...') // Base64 encoded explosion sound
+            playerName: document.getElementById('player-name'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsPanel: document.getElementById('settings-panel'),
+            saveSettingsBtn: document.getElementById('save-settings-btn'),
+            tableBtns: document.querySelectorAll('.table-btn'),
+            operationBtns: document.querySelectorAll('.operation-btn')
         };
 
         // Initialize game
@@ -313,89 +388,89 @@
             }, gameState.gameDuration);
         }
 
-        // Generate a new multiplication problem
+        // Generate a new problem based on selected operation
         function generateNewProblem() {
-          // Supprimer l'ancien invader
-          if (gameState.invaderElement) {
-            gameState.invaderElement.remove();
-            gameState.invaderElement = null;
-          }
-        
-          let a, b;
-        
-          if (selectedTable !== "all") {
-            a = parseInt(selectedTable);
-            b = Math.floor(Math.random() * 12) + 1;
-          } else {
-            a = Math.floor(Math.random() * 9) + 2;
-            b = Math.floor(Math.random() * 12) + 1;
-          }
-        
-          let problem, answer;
-          switch (selectedOperation) {
-            case "multiplication":
-              problem = `${a} × ${b}`;
-              answer = a * b;
-              break;
-            case "addition":
-              problem = `${a} + ${b}`;
-              answer = a + b;
-              break;
-            case "soustraction":
-              if (b > a) [a, b] = [b, a];
-              problem = `${a} − ${b}`;
-              answer = a - b;
-              break;
-            case "division":
-              answer = a;
-              b = Math.floor(Math.random() * 9) + 2;
-              a = a * b;
-              problem = `${a} ÷ ${b}`;
-              break;
-          }
-        
-          gameState.currentProblem = problem;
-          gameState.currentAnswer = answer;
-        
-          // Création de l'invader (comme dans le jeu original)
-          const invader = document.createElement("div");
-          invader.className = "invader";
-          invader.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
-          invader.style.top = "0px";
-        
-          const spaceship = document.createElement("div");
-          spaceship.className = "spaceship-body";
-        
-          const cockpit = document.createElement("div");
-          cockpit.className = "spaceship-cockpit";
-          cockpit.textContent = problem;
-          spaceship.appendChild(cockpit);
-        
-          const wings = document.createElement("div");
-          wings.className = "spaceship-wings";
-        
-          const wingLeft = document.createElement("div");
-          wingLeft.className = "wing wing-left";
-        
-          const wingRight = document.createElement("div");
-          wingRight.className = "wing wing-right";
-        
-          wings.appendChild(wingLeft);
-          wings.appendChild(wingRight);
-          spaceship.appendChild(wings);
-        
-          const engine = document.createElement("div");
-          engine.className = "spaceship-engine";
-          spaceship.appendChild(engine);
-        
-          invader.appendChild(spaceship);
-          elements.invaderContainer.appendChild(invader);
-        
-          gameState.invaderElement = invader;
-          gameState.invaderPosition = 0;
-        
-          gameState.timeLeft = gameState.maxTime;
-          updateTimerDisplay();
+            // Remove old invader
+            if (gameState.invaderElement) {
+                gameState.invaderElement.remove();
+                gameState.invaderElement = null;
+            }
+            
+            let a, b;
+            
+            if (gameState.selectedTable !== "all") {
+                a = parseInt(gameState.selectedTable);
+                b = Math.floor(Math.random() * 12) + 1;
+            } else {
+                a = Math.floor(Math.random() * 9) + 2;
+                b = Math.floor(Math.random() * 12) + 1;
+            }
+            
+            let problem, answer;
+            switch (gameState.selectedOperation) {
+                case "multiplication":
+                    problem = `${a} × ${b}`;
+                    answer = a * b;
+                    break;
+                case "addition":
+                    problem = `${a} + ${b}`;
+                    answer = a + b;
+                    break;
+                case "soustraction":
+                    if (b > a) [a, b] = [b, a];
+                    problem = `${a} − ${b}`;
+                    answer = a - b;
+                    break;
+                case "division":
+                    answer = a;
+                    b = Math.floor(Math.random() * 9) + 2;
+                    a = a * b;
+                    problem = `${a} ÷ ${b}`;
+                    break;
+            }
+            
+            gameState.currentProblem = problem;
+            gameState.currentAnswer = answer;
+            
+            // Create invader
+            const invader = document.createElement("div");
+            invader.className = "invader";
+            invader.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
+            invader.style.top = "0px";
+            
+            const spaceship = document.createElement("div");
+            spaceship.className = "spaceship-body";
+            
+            const cockpit = document.createElement("div");
+            cockpit.className = "spaceship-cockpit";
+            cockpit.textContent = problem;
+            spaceship.appendChild(cockpit);
+            
+            const wings = document.createElement("div");
+            wings.className = "spaceship-wings";
+            
+            const wingLeft = document.createElement("div");
+            wingLeft.className = "wing wing-left";
+            
+            const wingRight = document.createElement("div");
+            wingRight.className = "wing wing-right";
+            
+            wings.appendChild(wingLeft);
+            wings.appendChild(wingRight);
+            spaceship.appendChild(wings);
+            
+            const engine = document.createElement("div");
+            engine.className = "spaceship-engine";
+            spaceship.appendChild(engine);
+            
+            invader.appendChild(spaceship);
+            elements.invaderContainer.appendChild(invader);
+            
+            gameState.invaderElement = invader;
+            gameState.invaderPosition = 0;
+            
+            gameState.timeLeft = gameState.maxTime;
+            updateTimerDisplay();
         }
 
         // Start the timer for the current problem
@@ -436,10 +511,6 @@
         function handleCorrectAnswer() {
             clearInterval(gameState.timerInterval);
             
-            // Play explosion sound
-            soundEffects.explosion.currentTime = 0;
-            soundEffects.explosion.play().catch(e => console.log("Audio play failed:", e));
-            
             // Calculate points based on time left
             let points = 0;
             if (gameState.timeLeft >= 7) {
@@ -465,28 +536,20 @@
             createExplosion();
             
             // Show positive feedback
-            function showFeedback(message) {
-                const feedbackElement = document.createElement('div');
-                feedbackElement.className = 'feedback-message';
-                
-                feedbackElement.innerHTML = `
-                    <div style="font-size: 24px; font-weight: bold; color: #ffff00; text-shadow: 0 0 10px #ff0000;">
-                        ESSAYEZ ENCORE !
-                    </div>
-                    <div style="font-size: 32px; color: #ffffff; text-shadow: 0 0 10px #00ff00; margin-top: 12px;">
-                        ${message}
-                    </div>
-                `;
+            const randomMessage = [
+                "SUPER !", "GÉNIAL !", "BIEN JOUÉ !", "EXCELLENT !", 
+                "PARFAIT !", "FORMIDABLE !", "BRAVO !", "INCROYABLE !"
+            ][Math.floor(Math.random() * 8)];
             
-                elements.feedbackContainer.appendChild(feedbackElement);
+            showFeedback(randomMessage);
             
-                setTimeout(() => {
-                    if (gameState.gameActive) {
-                        generateNewProblem();
-                        startTimer();
-                    }
-                }, 1000);
-            }
+            // Generate new problem after a short delay
+            setTimeout(() => {
+                if (gameState.gameActive) {
+                    generateNewProblem();
+                    startTimer();
+                }
+            }, 1000);
         }
 
         // Handle incorrect answer
@@ -502,9 +565,9 @@
                 gameState.invaderElement = null;
             }
             
-            // Show feedback
+            // Show feedback with correct answer
             const correctEquation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
-            showFeedback(`${correctEquation}`);
+            showFeedback(correctEquation);
             
             // Generate new problem after a short delay
             setTimeout(() => {
@@ -512,7 +575,7 @@
                     generateNewProblem();
                     startTimer();
                 }
-            }, 6000);
+            }, 2000);
         }
 
         // Create explosion animation
@@ -583,6 +646,24 @@
             }
         }
 
+        // Open settings panel
+        function openSettings() {
+            elements.settingsPanel.classList.add('active');
+        }
+
+        // Close settings panel
+        function closeSettings() {
+            elements.settingsPanel.classList.remove('active');
+        }
+
+        // Save settings
+        function saveSettings() {
+            closeSettings();
+            if (gameState.gameActive) {
+                generateNewProblem();
+            }
+        }
+
         // Event listeners
         elements.startBtn.addEventListener('click', initGame);
         
@@ -590,7 +671,7 @@
             if (!gameState.gameActive) return;
             
             const userAnswer = parseInt(elements.answerInput.value);
-            if (userAnswer === gameState.currentAnswer) {
+            if (!isNaN(userAnswer) && userAnswer === gameState.currentAnswer) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
@@ -630,6 +711,28 @@
                     elements.gameOverModal.classList.add('hidden');
                 }, 1000);
             }, 1000);
+        });
+        
+        // Settings event listeners
+        elements.settingsBtn.addEventListener('click', openSettings);
+        elements.saveSettingsBtn.addEventListener('click', saveSettings);
+        
+        // Table selection
+        elements.tableBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                elements.tableBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                gameState.selectedTable = btn.dataset.table;
+            });
+        });
+        
+        // Operation selection
+        elements.operationBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                elements.operationBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                gameState.selectedOperation = btn.dataset.operation;
+            });
         });
     </script>
 </body>
