@@ -437,15 +437,18 @@
             createExplosion();
             
             // Show positive feedback
-            showFeedback(feedbackMessages[Math.floor(Math.random() * feedbackMessages.length)]);
+            function showFeedback(message) {
+                const feedbackElement = document.createElement('div');
+                feedbackElement.className = 'feedback-message';
+                feedbackElement.innerHTML = message.replace(/\n/g, '<br>'); // permet les sauts de ligne
             
-            // Generate new problem after a short delay
-            setTimeout(() => {
-                if (gameState.gameActive) {
-                    generateNewProblem();
-                    startTimer();
-                }
-            }, 1000);
+                elements.feedbackContainer.appendChild(feedbackElement);
+            
+                // Supprime le message après 4 secondes (4000 ms)
+                setTimeout(() => {
+                    feedbackElement.remove();
+                }, 4000);
+            }
         }
 
         // Handle incorrect answer
@@ -462,7 +465,8 @@
             }
             
             // Show feedback
-            showFeedback("ESSAYEZ ENCORE !");
+            const correctEquation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
+            showFeedback(`ESSAYEZ ENCORE !\n${correctEquation}`);
             
             // Generate new problem after a short delay
             setTimeout(() => {
