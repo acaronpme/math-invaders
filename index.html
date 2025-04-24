@@ -453,8 +453,11 @@
                 elements.feedbackContainer.appendChild(feedbackElement);
             
                 setTimeout(() => {
-                    feedbackElement.remove();
-                }, 6000); // affichage 6 secondes
+                    if (gameState.gameActive) {
+                        generateNewProblem();
+                        startTimer();
+                    }
+                }, 1000);
             }
         }
 
