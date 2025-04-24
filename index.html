@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Invaders</title>
+    <title>Envahisseurs Mathématiques</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -13,13 +13,17 @@
             background-color: #0f0f23;
             color: #00ff00;
             overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .game-container {
             position: relative;
             width: 100%;
             max-width: 800px;
-            height: 500px;
+            height: 400px; /* Reduced height for laptop screens */
             margin: 0 auto;
             border: 4px solid #00ff00;
             background-color: #000;
@@ -28,7 +32,7 @@
         
         .invader {
             position: absolute;
-            width: 80px;
+            width: 160px; /* Wider ship */
             height: 80px;
             background-size: contain;
             background-repeat: no-repeat;
@@ -43,24 +47,23 @@
             border-radius: 50% 50% 20% 20%;
             position: relative;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Horizontal layout */
             align-items: center;
             justify-content: center;
         }
         
         .spaceship-cockpit {
-            width: 60%;
-            height: 30%;
+            width: 70%; /* Wider cockpit */
+            height: 50%;
             background-color: #66aaff;
-            border-radius: 50% 50% 0 0;
-            position: absolute;
-            top: 10%;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             color: white;
             text-shadow: 0 0 5px black;
+            margin: 0 10px;
         }
         
         .spaceship-wings {
@@ -152,10 +155,10 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center justify-center p-4">
     <div class="text-center mb-4">
-        <h1 class="text-4xl md:text-5xl retro-text mb-2">MATH INVADERS</h1>
-        <p class="text-lg retro-text">Destroy the spaceships by solving multiplication problems!</p>
+        <h1 class="text-4xl md:text-5xl retro-text mb-2">ENVAHISSEURS MATHÉMATIQUES</h1>
+        <p class="text-lg retro-text">Détruisez les vaisseaux en résolvant des multiplications !</p>
     </div>
     
     <div class="game-container pixel-border relative">
@@ -170,52 +173,53 @@
                 <div id="timer-bar" class="timer-bar bg-green-500"></div>
             </div>
             <div class="flex">
-                <input id="answer-input" type="text" class="flex-1 px-4 py-2 bg-black text-green-500 border-2 border-green-500 focus:outline-none focus:border-yellow-500" placeholder="Type answer here..." autocomplete="off">
-                <button id="submit-btn" class="ml-2 px-4 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">FIRE!</button>
+                <input id="answer-input" type="text" class="flex-1 px-4 py-2 bg-black text-green-500 border-2 border-green-500 focus:outline-none focus:border-yellow-500" placeholder="Tapez la réponse ici..." autocomplete="off">
+                <button id="submit-btn" class="ml-2 px-4 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">TIREZ !</button>
+                <button id="stop-btn" class="ml-2 px-4 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 hidden">ARRÊTER</button>
             </div>
         </div>
     </div>
     
     <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden">
         <div class="bg-gray-900 p-8 max-w-md w-full pixel-border text-center">
-            <h2 class="text-3xl text-red-500 mb-4 retro-text">GAME OVER</h2>
-            <p class="text-xl text-white mb-6 retro-text">Your final score: <span id="final-score" class="text-yellow-500">0</span></p>
+            <h2 class="text-3xl text-red-500 mb-4 retro-text">FIN DE PARTIE</h2>
+            <p class="text-xl text-white mb-6 retro-text">Votre score final: <span id="final-score" class="text-yellow-500">0</span></p>
             
             <form id="score-form" class="mb-6">
                 <div class="mb-4">
-                    <label for="player-name" class="block text-green-500 mb-2">Enter your name:</label>
+                    <label for="player-name" class="block text-green-500 mb-2">Entrez votre nom:</label>
                     <input type="text" id="player-name" class="w-full px-4 py-2 bg-black text-white border-2 border-green-500" required>
                 </div>
-                <button type="submit" class="px-6 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">Send Score</button>
+                <button type="submit" class="px-6 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">Envoyer le score</button>
             </form>
             
-            <button id="play-again-btn" class="px-6 py-2 bg-blue-900 text-white border-2 border-blue-500 hover:bg-blue-800">Play Again</button>
+            <button id="play-again-btn" class="px-6 py-2 bg-blue-900 text-white border-2 border-blue-500 hover:bg-blue-800">Rejouer</button>
         </div>
     </div>
     
     <div class="mt-6 text-center">
-        <button id="start-btn" class="px-8 py-3 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 retro-text">START GAME</button>
+        <button id="start-btn" class="px-8 py-3 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 retro-text">COMMENCER</button>
     </div>
     
     <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
         <div class="p-4 bg-gray-900 border-2 border-green-500">
-            <h3 class="text-yellow-500 mb-2">Scoring</h3>
+            <h3 class="text-yellow-500 mb-2">Points</h3>
             <p class="text-sm">0-3 sec: 10 pts</p>
             <p class="text-sm">3-6 sec: 7 pts</p>
             <p class="text-sm">6-10 sec: 5 pts</p>
             <p class="text-sm">10+ sec: 0 pts</p>
         </div>
         <div class="p-4 bg-gray-900 border-2 border-green-500">
-            <h3 class="text-yellow-500 mb-2">Combo Bonus</h3>
-            <p class="text-sm">+5 pts every</p>
-            <p class="text-sm">3 correct</p>
-            <p class="text-sm">answers in a row</p>
+            <h3 class="text-yellow-500 mb-2">Bonus Combo</h3>
+            <p class="text-sm">+5 pts tous les</p>
+            <p class="text-sm">3 bonnes</p>
+            <p class="text-sm">réponses</p>
         </div>
         <div class="p-4 bg-gray-900 border-2 border-green-500">
-            <h3 class="text-yellow-500 mb-2">Controls</h3>
-            <p class="text-sm">Type answer</p>
-            <p class="text-sm">Press ENTER</p>
-            <p class="text-sm">or click FIRE!</p>
+            <h3 class="text-yellow-500 mb-2">Contrôles</h3>
+            <p class="text-sm">Tapez la réponse</p>
+            <p class="text-sm">Appuyez sur ENTREZ</p>
+            <p class="text-sm">ou cliquez TIREZ!</p>
         </div>
     </div>
 
@@ -233,9 +237,11 @@
             timerInterval: null,
             invaderSpeed: 2,
             invaderPosition: 0,
-            maxInvaderPosition: 400, // 500px container height - 80px invader height - 20px bottom space
+            maxInvaderPosition: 320, // 400px container height - 80px invader height
             invaderElement: null,
-            explosionElement: null
+            explosionElement: null,
+            gameDuration: 120000, // 2 minutes
+            gameTimeout: null
         };
 
         // DOM elements
@@ -247,6 +253,7 @@
             comboDisplay: document.getElementById('combo-display'),
             answerInput: document.getElementById('answer-input'),
             submitBtn: document.getElementById('submit-btn'),
+            stopBtn: document.getElementById('stop-btn'),
             timerBar: document.getElementById('timer-bar'),
             startBtn: document.getElementById('start-btn'),
             gameOverModal: document.getElementById('game-over-modal'),
@@ -256,19 +263,24 @@
             playerName: document.getElementById('player-name')
         };
 
-        // Positive feedback messages
+        // Positive feedback messages in French
         const feedbackMessages = [
-            "GREAT!",
-            "AWESOME!",
-            "WELL DONE!",
-            "SUPER!",
-            "FANTASTIC!",
-            "EXCELLENT!",
-            "PERFECT!",
-            "AMAZING!",
-            "BRILLIANT!",
-            "YOU ROCK!"
+            "SUPER !",
+            "GÉNIAL !",
+            "BIEN JOUÉ !",
+            "EXCELLENT !",
+            "PARFAIT !",
+            "FORMIDABLE !",
+            "BRAVO !",
+            "INCROYABLE !",
+            "FANTASTIQUE !",
+            "TOP !"
         ];
+
+        // Sound effects
+        const soundEffects = {
+            explosion: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...') // Base64 encoded explosion sound
+        };
 
         // Initialize game
         function initGame() {
@@ -286,11 +298,19 @@
             elements.answerInput.value = '';
             elements.answerInput.disabled = false;
             elements.submitBtn.disabled = false;
+            elements.stopBtn.classList.remove('hidden');
             elements.startBtn.classList.add('hidden');
             
             // Start the game
             generateNewProblem();
             startTimer();
+            
+            // Set game duration
+            gameState.gameTimeout = setTimeout(() => {
+                if (gameState.gameActive) {
+                    endGame();
+                }
+            }, gameState.gameDuration);
         }
 
         // Generate a new multiplication problem
@@ -309,7 +329,7 @@
             // Create and position the spaceship
             gameState.invaderElement = document.createElement('div');
             gameState.invaderElement.className = 'invader';
-            gameState.invaderElement.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 80)}px`;
+            gameState.invaderElement.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
             gameState.invaderElement.style.top = '0px';
             
             // Create spaceship structure
@@ -388,6 +408,10 @@
         function handleCorrectAnswer() {
             clearInterval(gameState.timerInterval);
             
+            // Play explosion sound
+            soundEffects.explosion.currentTime = 0;
+            soundEffects.explosion.play().catch(e => console.log("Audio play failed:", e));
+            
             // Calculate points based on time left
             let points = 0;
             if (gameState.timeLeft >= 7) {
@@ -438,7 +462,7 @@
             }
             
             // Show feedback
-            showFeedback("TRY AGAIN!");
+            showFeedback("ESSAYEZ ENCORE !");
             
             // Generate new problem after a short delay
             setTimeout(() => {
@@ -493,6 +517,7 @@
         function endGame() {
             gameState.gameActive = false;
             clearInterval(gameState.timerInterval);
+            clearTimeout(gameState.gameTimeout);
             
             if (gameState.invaderElement) {
                 gameState.invaderElement.remove();
@@ -501,11 +526,19 @@
             
             elements.answerInput.disabled = true;
             elements.submitBtn.disabled = true;
+            elements.stopBtn.classList.add('hidden');
             elements.startBtn.classList.remove('hidden');
             
             // Show game over modal
             elements.finalScore.textContent = gameState.score;
             elements.gameOverModal.classList.remove('hidden');
+        }
+
+        // Stop the game manually
+        function stopGame() {
+            if (confirm("Voulez-vous vraiment arrêter la partie ? Votre score sera perdu.")) {
+                endGame();
+            }
         }
 
         // Event listeners
@@ -531,6 +564,8 @@
             }
         });
         
+        elements.stopBtn.addEventListener('click', stopGame);
+        
         elements.playAgainBtn.addEventListener('click', () => {
             elements.gameOverModal.classList.add('hidden');
             initGame();
@@ -544,23 +579,16 @@
             
             const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
+            submitBtn.textContent = 'Envoi...';
             
             // In a real implementation, you would send the score to your backend here
             setTimeout(() => {
-                submitBtn.textContent = 'Sent!';
+                submitBtn.textContent = 'Envoyé !';
                 setTimeout(() => {
                     elements.gameOverModal.classList.add('hidden');
                 }, 1000);
             }, 1000);
         });
-
-        // Game duration (2 minutes)
-        setTimeout(() => {
-            if (gameState.gameActive) {
-                endGame();
-            }
-        }, 120000);
     </script>
 </body>
 </html>
