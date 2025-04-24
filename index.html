@@ -696,21 +696,41 @@
         
         elements.scoreForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+        
             const playerName = elements.playerName.value.trim();
             if (!playerName) return;
-            
+        
+            const payload = {
+                name: playerName,
+                score: gameState.score,
+                secret: "rose4318" // doit correspondre à ton script
+            };
+        
             const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Envoi...';
-            
-            // In a real implementation, you would send the score to your backend here
-            setTimeout(() => {
-                submitBtn.textContent = 'Envoyé !';
-                setTimeout(() => {
-                    elements.gameOverModal.classList.add('hidden');
-                }, 1000);
-            }, 1000);
+        
+            try {
+                const res = await fetch('https://script.google.com/macros/s/AKfycbxM5R-MZ0-utG9aSGIXv4x9NojAz4wWl2j7bx-VJ_5_y8_KzI5dMTsK_7XtqpmjT5fI/exec', {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+        
+                if (res.ok) {
+                    submitBtn.textContent = 'Envoyé !';
+                    setTimeout(() => {
+                        elements.gameOverModal.classList.add('hidden');
+                    }, 1000);
+                } else {
+                    throw new Error('Erreur serveur');
+                }
+            } catch (error) {
+                submitBtn.textContent = 'Erreur';
+                console.error(error);
+            }
         });
         
         // Settings event listeners
