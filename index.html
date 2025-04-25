@@ -207,7 +207,7 @@
         <h1 class="text-2xl md:text-3xl retro-text mb-2">ENVAHISSEURS MATHÉMATIQUES</h1>
         <p class="text-lg retro-text">Détruisez les vaisseaux en résolvant des calculs !</p>
     </div>
-    
+    <div id="player-list" class="text-sm text-green-400 mb-4 text-center"></div>
     <div class="game-container pixel-border relative">
         <div id="score-display" class="absolute top-4 left-4 text-xl retro-text">SCORE: 0</div>
         <div id="combo-display" class="combo-display">COMBO: 0</div>
@@ -229,6 +229,7 @@
     </div>
     
     <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden">
+        <div id="player-list" class="mt-6 text-center text-white retro-text"></div>
         <div class="bg-gray-900 p-8 max-w-md w-full pixel-border text-center">
             <h2 class="text-3xl text-red-500 mb-4 retro-text">FIN DE PARTIE</h2>
             <p class="text-xl text-white mb-6 retro-text">Votre score final: <span id="final-score" class="text-yellow-500">0</span></p>
@@ -311,6 +312,17 @@
     </div>
 
     <script>
+
+        function updatePlayerListDisplay() {
+            const container = document.getElementById("player-list");
+            const data = JSON.parse(sessionStorage.getItem("players")) || [];
+            if (data.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            const items = data.map(p => `<li>${p.name} - ${p.score} pts</li>`).join("");
+            container.innerHTML = `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>${items}</ul>`;
+        }
         // Game state
         const gameState = {
             score: 0,
@@ -694,44 +706,33 @@
             initGame();
         });
         
-        elements.scoreForm.addEventListener('submit', async (e) => {
+        elements.scoreForm.addEventListener('submit', (e) => {
             e.preventDefault();
         
             const playerName = elements.playerName.value.trim();
             if (!playerName) return;
         
-            const payload = {
-                name: playerName,
-                score: gameState.score,
-                secret: "rose4318" // doit correspondre à ton script
-            };
-        
             const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Envoi...';
         
-            try {
-                const res = await fetch('https://script.google.com/macros/s/AKfycbxM5R-MZ0-utG9aSGIXv4x9NojAz4wWl2j7bx-VJ_5_y8_KzI5dMTsK_7XtqpmjT5fI/exec', {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+            // Enregistre dans sessionStorage
+            const existing = JSON.parse(sessionStorage.getItem("players")) || [];
+            existing.push({ name: playerName, score: gameState.score });
+            sessionStorage.setItem("players", JSON.stringify(existing));
         
-                if (res.ok) {
-                    submitBtn.textContent = 'Envoyé !';
-                    setTimeout(() => {
-                        elements.gameOverModal.classList.add('hidden');
-                    }, 1000);
-                } else {
-                    throw new Error('Erreur serveur');
-                }
-            } catch (error) {
-                submitBtn.textContent = 'Erreur';
-                console.error(error);
-            }
+            // Affiche les scores locaux
+            updatePlayerListDisplay();
+        
+            submitBtn.textContent = 'Enregistré !';
+        
+            setTimeout(() => {
+                elements.gameOverModal.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer le score';
+            }, 1000);
         });
+
         
         // Settings event listeners
         elements.settingsBtn.addEventListener('click', openSettings);
@@ -754,6 +755,9 @@
                 gameState.selectedOperation = btn.dataset.operation;
             });
         });
+        document.addEventListener("DOMContentLoaded", () => {
+    updatePlayerListDisplay();
+});
     </script>
 </body>
 </html>
