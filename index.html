@@ -750,11 +750,6 @@
                 gameState.selectedOperation = btn.dataset.operation;
             });
         });
-const scoreModal = document.getElementById('score-modal');
-const scoresList = document.getElementById('scores-list');
-
-const closeScoresBtn = document.getElementById('close-scores-btn');
-
 
 
 closeScoresBtn.addEventListener('click', () => {
@@ -785,9 +780,10 @@ function updatePlayerListDisplay() {
         
         document.addEventListener("DOMContentLoaded", () => {
     updatePlayerListDisplay();
-});
-const toggleScoresBtn = document.getElementById('toggle-scores-btn');
+
+            const toggleScoresBtn = document.getElementById('toggle-scores-btn');
 const scoreModal = document.getElementById('score-modal');
+const scoresList = document.getElementById('scores-list');
 const closeScoresBtn = document.getElementById('close-scores-btn');
 
 toggleScoresBtn.addEventListener('click', () => {
@@ -806,6 +802,8 @@ closeScoresBtn.addEventListener('click', () => {
     scoreModal.classList.add('hidden');
     toggleScoresBtn.textContent = "VOIR SCORES";
 });
+});
+
 
     </script>
     <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
