@@ -314,16 +314,6 @@
 
     <script>
 
-        function updatePlayerListDisplay() {
-            const container = document.getElementById("player-list");
-            const data = JSON.parse(sessionStorage.getItem("players")) || [];
-            if (data.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            const items = data.map(p => `<li>${p.name} - ${p.score} pts</li>`).join("");
-            container.innerHTML = `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>${items}</ul>`;
-        }
         // Game state
         const gameState = {
             score: 0,
@@ -708,27 +698,35 @@
         });
         
         elements.scoreForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-        
-            const playerName = elements.playerName.value.trim();
-            if (!playerName) return;
-        
-            const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Enregistrement...';
-        
-            // Ajouter aux scores locaux
-            sessionPlayers.push({ name: playerName, score: gameState.score });
-            updatePlayerListDisplay();
-        
-            submitBtn.textContent = 'Enregistré !';
-            setTimeout(() => {
-                elements.gameOverModal.classList.add('hidden');
-                elements.playerName.value = '';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Envoyer le score';
-            }, 1000);
-        });
+    e.preventDefault();
+
+    const playerName = elements.playerName.value.trim();
+    if (!playerName) return;
+
+    const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enregistrement...';
+
+    // Charger l’existant
+    const scores = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
+
+    // Ajouter nouveau score
+    scores.push({ name: playerName, score: gameState.score });
+
+    // Sauvegarder dans sessionStorage
+    sessionStorage.setItem("sessionPlayers", JSON.stringify(scores));
+
+    // Mettre à jour l’affichage
+    updatePlayerListDisplay();
+
+    submitBtn.textContent = 'Enregistré !';
+    setTimeout(() => {
+        elements.gameOverModal.classList.add('hidden');
+        elements.playerName.value = '';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Envoyer le score';
+    }, 1000);
+});
 
         
         // Settings event listeners
@@ -752,7 +750,7 @@
                 gameState.selectedOperation = btn.dataset.operation;
             });
         });
-const scoresModal = document.getElementById('scores-modal');
+const scoreModal = document.getElementById('score-modal');
 const scoresList = document.getElementById('scores-list');
 const scoresBtn = document.getElementById('scores-btn');
 const closeScoresBtn = document.getElementById('close-scores-btn');
@@ -768,17 +766,30 @@ closeScoresBtn.addEventListener('click', () => {
 
 function updatePlayerListDisplay() {
     const players = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-    scoresList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
+
+    // 1. Mettre à jour le résumé rapide (au-dessus du jeu)
+    const topList = document.getElementById("player-list");
+    if (topList) {
+        if (players.length === 0) {
+            topList.innerHTML = '';
+        } else {
+            topList.innerHTML = `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>` +
+                players.map(p => `<li>${p.name} - ${p.score} pts</li>`).join("") + `</ul>`;
+        }
+    }
+
+    // 2. Mettre à jour la modale (popup des scores)
+    const modalList = document.getElementById("scores-list");
+    if (modalList) {
+        modalList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
+    }
 }
 
         
         document.addEventListener("DOMContentLoaded", () => {
     updatePlayerListDisplay();
 });
-        // Boutons de score
-document.getElementById('show-scores-btn').addEventListener('click', () => {
-    document.getElementById('score-modal').classList.remove('hidden');
-});
+
 
 document.getElementById('close-scores-btn').addEventListener('click', () => {
     document.getElementById('score-modal').classList.add('hidden');
@@ -787,7 +798,7 @@ document.getElementById('close-scores-btn').addEventListener('click', () => {
     <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
     <div class="bg-gray-800 border-4 border-green-500 p-6 max-w-md w-full text-white">
         <h2 class="text-xl text-yellow-400 mb-4 retro-text">Scores de la session</h2>
-        <ul id="player-list" class="mb-4 space-y-2 list-disc list-inside text-sm text-white"></ul>
+        <ul id="scores-list" class="mb-4 space-y-2 list-disc list-inside text-sm text-white"></ul>
         <div class="text-right">
             <button id="close-scores-btn" class="px-4 py-2 bg-red-900 border-2 border-red-500 hover:bg-red-800">Fermer</button>
         </div>
