@@ -224,7 +224,7 @@
                 <button id="submit-btn" class="ml-2 px-4 py-2 bg-green-900 text-white border-2 border-green-500 hover:bg-green-800">TIREZ !</button>
                 <button id="stop-btn" class="ml-2 px-4 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 hidden">ARRÊTER</button>
                 <button id="settings-btn" class="ml-2 px-4 py-2 bg-purple-900 text-white border-2 border-purple-500 hover:bg-purple-800">PARAMÈTRES</button>
-                <button id="scores-btn" class="ml-2 px-4 py-2 bg-yellow-800 text-white border-2 border-yellow-500 hover:bg-yellow-700">VOIR SCORES</button>
+                <button id="toggle-scores-btn" class="ml-2 px-4 py-2 bg-yellow-800 text-white border-2 border-yellow-500 hover:bg-yellow-700">VOIR SCORES</button>
             </div>
         </div>
     </div>
@@ -752,13 +752,10 @@
         });
 const scoreModal = document.getElementById('score-modal');
 const scoresList = document.getElementById('scores-list');
-const scoresBtn = document.getElementById('scores-btn');
+
 const closeScoresBtn = document.getElementById('close-scores-btn');
 
-scoresBtn.addEventListener('click', () => {
-    updatePlayerListDisplay();
-    scoresModal.classList.remove('hidden');
-});
+
 
 closeScoresBtn.addEventListener('click', () => {
     scoresModal.classList.add('hidden');
@@ -789,11 +786,27 @@ function updatePlayerListDisplay() {
         document.addEventListener("DOMContentLoaded", () => {
     updatePlayerListDisplay();
 });
+const toggleScoresBtn = document.getElementById('toggle-scores-btn');
+const scoreModal = document.getElementById('score-modal');
+const closeScoresBtn = document.getElementById('close-scores-btn');
 
-
-document.getElementById('close-scores-btn').addEventListener('click', () => {
-    document.getElementById('score-modal').classList.add('hidden');
+toggleScoresBtn.addEventListener('click', () => {
+    const isVisible = !scoreModal.classList.contains('hidden');
+    if (isVisible) {
+        scoreModal.classList.add('hidden');
+        toggleScoresBtn.textContent = "VOIR SCORES";
+    } else {
+        updatePlayerListDisplay();
+        scoreModal.classList.remove('hidden');
+        toggleScoresBtn.textContent = "MASQUER SCORES";
+    }
 });
+
+closeScoresBtn.addEventListener('click', () => {
+    scoreModal.classList.add('hidden');
+    toggleScoresBtn.textContent = "VOIR SCORES";
+});
+
     </script>
     <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
     <div class="bg-gray-800 border-4 border-green-500 p-6 max-w-md w-full text-white">
