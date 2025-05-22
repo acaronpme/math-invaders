@@ -393,47 +393,46 @@
 
         // Generate a new problem based on selected operation
         function generateNewProblem() {
-            // Remove old invader
-            if (gameState.invaderElement) {
-                gameState.invaderElement.remove();
-                gameState.invaderElement = null;
-            }
-            
-            let a, b;
-            
-            if (gameState.selectedTable !== "all") {
-                a = parseInt(gameState.selectedTable);
-                b = Math.floor(Math.random() * 12) + 1;
-            } else {
-                a = Math.floor(Math.random() * 9) + 2;
-                b = Math.floor(Math.random() * 12) + 1;
-            }
-            
-            let problem, answer;
-            switch (gameState.selectedOperation) {
-                case "multiplication":
-                    problem = `${a} × ${b}`;
-                    answer = a * b;
-                    break;
-                case "addition":
-                    problem = `${a} + ${b}`;
-                    answer = a + b;
-                    break;
-                case "soustraction":
-                    if (b > a) [a, b] = [b, a];
-                    problem = `${a} − ${b}`;
-                    answer = a - b;
-                    break;
-                case "division":
-                    answer = a;
-                    b = Math.floor(Math.random() * 9) + 2;
-                    a = a * b;
-                    problem = `${a} ÷ ${b}`;
-                    break;
-            }
-            
-            gameState.currentProblem = problem;
-            gameState.currentAnswer = answer;
+    if (gameState.invaderElement) {
+        gameState.invaderElement.remove();
+        gameState.invaderElement = null;
+    }
+
+    let a, b, problem, answer;
+
+    switch (gameState.selectedOperation) {
+        case "multiplication":
+            a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
+            b = Math.floor(Math.random() * 12) + 1;
+            problem = `${a} × ${b}`;
+            answer = a * b;
+            break;
+
+        case "addition":
+            a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
+            b = Math.floor(Math.random() * 20) + 1;
+            problem = `${a} + ${b}`;
+            answer = a + b;
+            break;
+
+        case "soustraction":
+            a = Math.floor(Math.random() * 20) + 1;
+            b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
+            if (b > a) [a, b] = [b, a];
+            problem = `${a} − ${b}`;
+            answer = a - b;
+            break;
+
+        case "division":
+            b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
+            answer = Math.floor(Math.random() * 12) + 1;
+            a = b * answer;
+            problem = `${a} ÷ ${b}`;
+            break;
+    }
+
+    gameState.currentProblem = problem;
+    gameState.currentAnswer = answer;
             
             // Create invader
             const invader = document.createElement("div");
