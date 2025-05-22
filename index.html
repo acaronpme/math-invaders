@@ -437,7 +437,8 @@
             // Create invader
             const invader = document.createElement("div");
             invader.className = "invader";
-            invader.style.left = `${Math.random() * (elements.gameContainer.offsetWidth - 160)}px`;
+            const maxLeft = elements.gameContainer.offsetWidth - 260; // marge de sécurité
+            invader.style.left = `${Math.floor(Math.random() * maxLeft)}px`;
             invader.style.top = "0px";
             
             const spaceship = document.createElement("div");
