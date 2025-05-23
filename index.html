@@ -642,13 +642,23 @@
                 }
             }, 2000);
         }
+
+function playBeep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    oscillator.type = 'square'; // Sounds more retro
+    oscillator.frequency.value = 440; // A4 note, classic beep
+    oscillator.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.2); // Short beep
+}
         
         // Create explosion animation
         function createExplosion() {
             if (gameState.explosionElement) {
                 gameState.explosionElement.remove();
             }
-            
+            playBeep();
             gameState.explosionElement = document.createElement('div');
             gameState.explosionElement.className = 'explosion';
             gameState.explosionElement.style.left = gameState.invaderElement.style.left;
