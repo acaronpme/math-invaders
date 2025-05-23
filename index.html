@@ -200,6 +200,54 @@
             background-color: #00ff00 !important;
             color: #000 !important;
         }
+        
+        .scores-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .scores-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .scores-content {
+            background-color: #111;
+            border: 4px solid #00ff00;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .scores-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+        
+        .scores-list li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #00ff00;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .scores-list li:nth-child(odd) {
+            background-color: rgba(0, 255, 0, 0.1);
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center p-4">
@@ -225,13 +273,11 @@
                 <button id="stop-btn" class="ml-2 px-4 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800 hidden">ARRÊTER</button>
                 <button id="settings-btn" class="ml-2 px-4 py-2 bg-purple-900 text-white border-2 border-purple-500 hover:bg-purple-800">PARAMÈTRES</button>
                 <button id="toggle-scores-btn" class="ml-2 px-4 py-2 bg-yellow-800 text-white border-2 border-yellow-500 hover:bg-yellow-700">VOIR SCORES</button>
-          
             </div>
         </div>
     </div>
     
     <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden">
-        <div id="player-list" class="mt-6 text-center text-white retro-text"></div>
         <div class="bg-gray-900 p-8 max-w-md w-full pixel-border text-center">
             <h2 class="text-3xl text-red-500 mb-4 retro-text">FIN DE PARTIE</h2>
             <p class="text-xl text-white mb-6 retro-text">Votre score final: <span id="final-score" class="text-yellow-500">0</span></p>
@@ -313,8 +359,18 @@
         </div>
     </div>
 
-    <script>
+    <!-- Scores Modal -->
+    <div id="scores-modal" class="scores-modal">
+        <div class="scores-content pixel-border">
+            <h2 class="text-2xl text-yellow-500 mb-4 text-center">SCORES DE LA SESSION</h2>
+            <ul id="scores-list" class="scores-list"></ul>
+            <div class="flex justify-center">
+                <button id="close-scores-btn" class="px-6 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800">FERMER</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
         // Game state
         const gameState = {
             score: 0,
@@ -336,7 +392,7 @@
             selectedTable: "all",
             selectedOperation: "multiplication"
         };
-
+        
         // DOM elements
         const elements = {
             gameContainer: document.querySelector('.game-container'),
@@ -358,9 +414,14 @@
             settingsPanel: document.getElementById('settings-panel'),
             saveSettingsBtn: document.getElementById('save-settings-btn'),
             tableBtns: document.querySelectorAll('.table-btn'),
-            operationBtns: document.querySelectorAll('.operation-btn')
+            operationBtns: document.querySelectorAll('.operation-btn'),
+            toggleScoresBtn: document.getElementById('toggle-scores-btn'),
+            scoresModal: document.getElementById('scores-modal'),
+            closeScoresBtn: document.getElementById('close-scores-btn'),
+            scoresList: document.getElementById('scores-list'),
+            playerList: document.getElementById('player-list')
         };
-
+        
         // Initialize game
         function initGame() {
             // Reset game state
@@ -391,49 +452,49 @@
                 }
             }, gameState.gameDuration);
         }
-
+        
         // Generate a new problem based on selected operation
         function generateNewProblem() {
-    if (gameState.invaderElement) {
-        gameState.invaderElement.remove();
-        gameState.invaderElement = null;
-    }
-
-    let a, b, problem, answer;
-
-    switch (gameState.selectedOperation) {
-        case "multiplication":
-            a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
-            b = Math.floor(Math.random() * 12) + 1;
-            problem = `${a} × ${b}`;
-            answer = a * b;
-            break;
-
-        case "addition":
-            a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
-            b = Math.floor(Math.random() * 20) + 1;
-            problem = `${a} + ${b}`;
-            answer = a + b;
-            break;
-
-        case "soustraction":
-            a = Math.floor(Math.random() * 20) + 1;
-            b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
-            if (b > a) [a, b] = [b, a];
-            problem = `${a} − ${b}`;
-            answer = a - b;
-            break;
-
-        case "division":
-            b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
-            answer = Math.floor(Math.random() * 12) + 1;
-            a = b * answer;
-            problem = `${a} ÷ ${b}`;
-            break;
-    }
-
-    gameState.currentProblem = problem;
-    gameState.currentAnswer = answer;
+            if (gameState.invaderElement) {
+                gameState.invaderElement.remove();
+                gameState.invaderElement = null;
+            }
+            
+            let a, b, problem, answer;
+            
+            switch (gameState.selectedOperation) {
+                case "multiplication":
+                    a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
+                    b = Math.floor(Math.random() * 12) + 1;
+                    problem = `${a} × ${b}`;
+                    answer = a * b;
+                    break;
+                
+                case "addition":
+                    a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
+                    b = Math.floor(Math.random() * 20) + 1;
+                    problem = `${a} + ${b}`;
+                    answer = a + b;
+                    break;
+                
+                case "soustraction":
+                    a = Math.floor(Math.random() * 20) + 1;
+                    b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
+                    if (b > a) [a, b] = [b, a];
+                    problem = `${a} − ${b}`;
+                    answer = a - b;
+                    break;
+                
+                case "division":
+                    b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
+                    answer = Math.floor(Math.random() * 12) + 1;
+                    a = b * answer;
+                    problem = `${a} ÷ ${b}`;
+                    break;
+            }
+            
+            gameState.currentProblem = problem;
+            gameState.currentAnswer = answer;
             
             // Create invader
             const invader = document.createElement("div");
@@ -476,7 +537,7 @@
             gameState.timeLeft = gameState.maxTime;
             updateTimerDisplay();
         }
-
+        
         // Start the timer for the current problem
         function startTimer() {
             clearInterval(gameState.timerInterval);
@@ -495,7 +556,7 @@
                 }
             }, 100);
         }
-
+        
         // Update the timer display
         function updateTimerDisplay() {
             const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
@@ -510,7 +571,7 @@
                 elements.timerBar.className = 'timer-bar bg-red-500';
             }
         }
-
+        
         // Handle correct answer
         function handleCorrectAnswer() {
             clearInterval(gameState.timerInterval);
@@ -555,7 +616,7 @@
                 }
             }, 1000);
         }
-
+        
         // Handle incorrect answer
         function handleIncorrectAnswer() {
             clearInterval(gameState.timerInterval);
@@ -581,7 +642,7 @@
                 }
             }, 2000);
         }
-
+        
         // Create explosion animation
         function createExplosion() {
             if (gameState.explosionElement) {
@@ -607,7 +668,7 @@
                 }
             }, 500);
         }
-
+        
         // Show feedback message
         function showFeedback(message) {
             const feedbackElement = document.createElement('div');
@@ -621,7 +682,7 @@
                 feedbackElement.remove();
             }, 2000);
         }
-
+        
         // End the game
         function endGame() {
             gameState.gameActive = false;
@@ -642,24 +703,24 @@
             elements.finalScore.textContent = gameState.score;
             elements.gameOverModal.classList.remove('hidden');
         }
-
+        
         // Stop the game manually
         function stopGame() {
             if (confirm("Voulez-vous vraiment arrêter la partie ? Votre score sera perdu.")) {
                 endGame();
             }
         }
-
+        
         // Open settings panel
         function openSettings() {
             elements.settingsPanel.classList.add('active');
         }
-
+        
         // Close settings panel
         function closeSettings() {
             elements.settingsPanel.classList.remove('active');
         }
-
+        
         // Save settings
         function saveSettings() {
             closeSettings();
@@ -667,7 +728,56 @@
                 generateNewProblem();
             }
         }
-
+        
+        // Toggle scores modal
+        function toggleScoresModal() {
+            if (elements.scoresModal.classList.contains('active')) {
+                elements.scoresModal.classList.remove('active');
+                elements.toggleScoresBtn.textContent = "VOIR SCORES";
+            } else {
+                updateScoresList();
+                elements.scoresModal.classList.add('active');
+                elements.toggleScoresBtn.textContent = "MASQUER SCORES";
+            }
+        }
+        
+        // Update scores list
+        function updateScoresList() {
+            const scores = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
+            
+            // Sort scores by highest first
+            scores.sort((a, b) => b.score - a.score);
+            
+            // Clear existing list
+            elements.scoresList.innerHTML = '';
+            elements.playerList.innerHTML = '';
+            
+            if (scores.length === 0) {
+                elements.scoresList.innerHTML = '<li class="text-center text-gray-400">Aucun score enregistré</li>';
+                return;
+            }
+            
+            // Add scores to modal
+            scores.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${index + 1}. ${player.name}</span> <span class="text-yellow-400">${player.score} pts</span>`;
+                elements.scoresList.appendChild(li);
+            });
+            
+            // Update quick summary (top of game)
+            const topScores = scores.slice( 0, 3 );
+            if (topScores.length > 0) {
+                const summary = document.createElement('div');
+                summary.innerHTML = `
+                    <h3 class="text-lg text-yellow-400 mb-2">Meilleurs scores</h3>
+                    <ul class="text-sm">
+                        ${topScores.map((p, i) => `<li>${i + 1}. ${p.name} - ${p.score} pts</li>`).join('')}
+                    </ul>
+                `;
+                elements.playerList.appendChild(summary);
+            }
+        }
+        
         // Event listeners
         elements.startBtn.addEventListener('click', initGame);
         
@@ -699,36 +809,35 @@
         });
         
         elements.scoreForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const playerName = elements.playerName.value.trim();
-    if (!playerName) return;
-
-    const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Enregistrement...';
-
-    // Charger l’existant
-    const scores = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-
-    // Ajouter nouveau score
-    scores.push({ name: playerName, score: gameState.score });
-
-    // Sauvegarder dans sessionStorage
-    sessionStorage.setItem("sessionPlayers", JSON.stringify(scores));
-
-    // Mettre à jour l’affichage
-    updatePlayerListDisplay();
-
-    submitBtn.textContent = 'Enregistré !';
-    setTimeout(() => {
-        elements.gameOverModal.classList.add('hidden');
-        elements.playerName.value = '';
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Envoyer le score';
-    }, 1000);
-});
-
+            e.preventDefault();
+            
+            const playerName = elements.playerName.value.trim();
+            if (!playerName) return;
+            
+            const submitBtn = elements.scoreForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enregistrement...';
+            
+            // Load existing scores
+            const scores = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
+            
+            // Add new score
+            scores.push({ name: playerName, score: gameState.score });
+            
+            // Save to sessionStorage
+            sessionStorage.setItem("sessionPlayers", JSON.stringify(scores));
+            
+            // Update display
+            updateScoresList();
+            
+            submitBtn.textContent = 'Enregistré !';
+            setTimeout(() => {
+                elements.gameOverModal.classList.add('hidden');
+                elements.playerName.value = '';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer le score';
+            }, 1000);
+        });
         
         // Settings event listeners
         elements.settingsBtn.addEventListener('click', openSettings);
@@ -751,102 +860,16 @@
                 gameState.selectedOperation = btn.dataset.operation;
             });
         });
-
-
-closeScoresBtn.addEventListener('click', () => {
-    scoresModal.classList.add('hidden');
-});
-
-function updatePlayerListDisplay() {
-    const players = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-
-    // 1. Mettre à jour le résumé rapide (au-dessus du jeu)
-    const topList = document.getElementById("player-list");
-    if (topList) {
-        if (players.length === 0) {
-            topList.innerHTML = '';
-        } else {
-            topList.innerHTML = `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>` +
-                players.map(p => `<li>${p.name} - ${p.score} pts</li>`).join("") + `</ul>`;
-        }
-    }
-
-    // 2. Mettre à jour la modale (popup des scores)
-    const modalList = document.getElementById("scores-list");
-    if (modalList) {
-        modalList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
-    }
-}
-
         
-        document.addEventListener("DOMContentLoaded", () => {
-    updatePlayerListDisplay();
-
-            const toggleScoresBtn = document.getElementById('toggle-scores-btn');
-const scoreModal = document.getElementById('score-modal');
-const scoresList = document.getElementById('scores-list');
-const closeScoresBtn = document.getElementById('close-scores-btn');
-
-toggleScoresBtn.addEventListener('click', () => {
-    const isVisible = !scoreModal.classList.contains('hidden');
-    if (isVisible) {
-        scoreModal.classList.add('hidden');
-        toggleScoresBtn.textContent = "VOIR SCORES";
-    } else {
-        updatePlayerListDisplay();
-        scoreModal.classList.remove('hidden');
-        toggleScoresBtn.textContent = "MASQUER SCORES";
-    }
-});
-
-closeScoresBtn.addEventListener('click', () => {
-    scoreModal.classList.add('hidden');
-    toggleScoresBtn.textContent = "VOIR SCORES";
-});
-});
-
-       
-    const toggleScoresBtn = document.getElementById('toggle-scores-btn');
-    const scoreModal = document.getElementById('score-modal');
-    const closeScoresBtn = document.getElementById('close-scores-btn');
-    const scoresList = document.getElementById('scores-list');
-
-    function updatePlayerListDisplay() {
-        const players = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-        scoresList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
-    }
-
-    toggleScoresBtn.addEventListener('click', () => {
-        const isVisible = !scoreModal.classList.contains('hidden');
-        if (isVisible) {
-            scoreModal.classList.add('hidden');
-            toggleScoresBtn.textContent = "VOIR SCORES";
-        } else {
-            updatePlayerListDisplay();
-            scoreModal.classList.remove('hidden');
-            toggleScoresBtn.textContent = "MASQUER SCORES";
-        }
-    });
-
-    closeScoresBtn.addEventListener('click', () => {
-        scoreModal.classList.add('hidden');
-        toggleScoresBtn.textContent = "VOIR SCORES";
-    });
-
-    document.addEventListener("DOMContentLoaded", updatePlayerListDisplay);
-
-
+        // Scores modal event listeners
+        elements.toggleScoresBtn.addEventListener('click', toggleScoresModal);
+        elements.closeScoresBtn.addEventListener('click', () => {
+            elements.scoresModal.classList.remove('active');
+            elements.toggleScoresBtn.textContent = "VOIR SCORES";
+        });
+        
+        // Initialize scores display
+        document.addEventListener("DOMContentLoaded", updateScoresList);
     </script>
-    <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
-    <div class="bg-gray-800 border-4 border-green-500 p-6 max-w-md w-full text-white">
-        <h2 class="text-xl text-yellow-400 mb-4 retro-text">Scores de la session</h2>
-        <ul id="scores-list" class="mb-4 space-y-2 list-disc list-inside text-sm text-white"></ul>
-        <div class="text-right">
-            <button id="close-scores-btn" class="px-4 py-2 bg-red-900 border-2 border-red-500 hover:bg-red-800">Fermer</button>
-        </div>
-    </div>
-</div>
-
-</div>
 </body>
 </html>
