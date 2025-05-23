@@ -372,8 +372,8 @@
             gameState.invaderPosition = 0;
             
             // Update UI
-            elements.scoreDisplay.textContent = SCORE: ${gameState.score};
-            elements.comboDisplay.textContent = COMBO: ${gameState.combo};
+            elements.scoreDisplay.textContent = `SCORE: ${gameState.score}`;
+            elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
             elements.answerInput.value = '';
             elements.answerInput.disabled = false;
             elements.submitBtn.disabled = false;
@@ -405,14 +405,14 @@
         case "multiplication":
             a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
             b = Math.floor(Math.random() * 12) + 1;
-            problem = ${a} × ${b};
+            problem = `${a} × ${b}`;
             answer = a * b;
             break;
 
         case "addition":
             a = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
             b = Math.floor(Math.random() * 20) + 1;
-            problem = ${a} + ${b};
+            problem = `${a} + ${b}`;
             answer = a + b;
             break;
 
@@ -420,7 +420,7 @@
             a = Math.floor(Math.random() * 20) + 1;
             b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
             if (b > a) [a, b] = [b, a];
-            problem = ${a} − ${b};
+            problem = `${a} − ${b}`;
             answer = a - b;
             break;
 
@@ -428,7 +428,7 @@
             b = (gameState.selectedTable !== "all") ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
             answer = Math.floor(Math.random() * 12) + 1;
             a = b * answer;
-            problem = ${a} ÷ ${b};
+            problem = `${a} ÷ ${b}`;
             break;
     }
 
@@ -439,7 +439,7 @@
             const invader = document.createElement("div");
             invader.className = "invader";
             const maxLeft = elements.gameContainer.offsetWidth - 260; // marge de sécurité
-            invader.style.left = ${Math.floor(Math.random() * maxLeft)}px;
+            invader.style.left = `${Math.floor(Math.random() * maxLeft)}px`;
             invader.style.top = "0px";
             
             const spaceship = document.createElement("div");
@@ -486,7 +486,7 @@
                 
                 // Move the spaceship down
                 gameState.invaderPosition += gameState.invaderSpeed;
-                gameState.invaderElement.style.top = ${gameState.invaderPosition}px;
+                gameState.invaderElement.style.top = `${gameState.invaderPosition}px`;
                 
                 if (gameState.timeLeft <= 0 || gameState.invaderPosition >= gameState.maxInvaderPosition) {
                     // Time's up or spaceship reached bottom
@@ -499,7 +499,7 @@
         // Update the timer display
         function updateTimerDisplay() {
             const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
-            elements.timerBar.style.width = ${percentage}%;
+            elements.timerBar.style.width = `${percentage}%`;
             
             // Change color based on time left
             if (percentage > 50) {
@@ -530,11 +530,11 @@
             if (gameState.correctInRow % 3 === 0) {
                 points += 5;
                 gameState.combo++;
-                elements.comboDisplay.textContent = COMBO: ${gameState.combo};
+                elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
             }
             
             gameState.score += points;
-            elements.scoreDisplay.textContent = SCORE: ${gameState.score};
+            elements.scoreDisplay.textContent = `SCORE: ${gameState.score}`;
             
             // Show explosion animation
             createExplosion();
@@ -561,7 +561,7 @@
             clearInterval(gameState.timerInterval);
             gameState.correctInRow = 0;
             gameState.combo = 0;
-            elements.comboDisplay.textContent = COMBO: ${gameState.combo};
+            elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
             
             // Remove the spaceship
             if (gameState.invaderElement) {
@@ -570,7 +570,7 @@
             }
             
             // Show feedback with correct answer
-            const correctEquation = ${gameState.currentProblem} = ${gameState.currentAnswer};
+            const correctEquation = `${gameState.currentProblem} = ${gameState.currentAnswer}`;
             showFeedback(correctEquation);
             
             // Generate new problem after a short delay
@@ -766,15 +766,15 @@ function updatePlayerListDisplay() {
         if (players.length === 0) {
             topList.innerHTML = '';
         } else {
-            topList.innerHTML = <h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul> +
-                players.map(p => <li>${p.name} - ${p.score} pts</li>).join("") + </ul>;
+            topList.innerHTML = `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>` +
+                players.map(p => `<li>${p.name} - ${p.score} pts</li>`).join("") + `</ul>`;
         }
     }
 
     // 2. Mettre à jour la modale (popup des scores)
     const modalList = document.getElementById("scores-list");
     if (modalList) {
-        modalList.innerHTML = players.map(p => <li>${p.name} — ${p.score} pts</li>).join("");
+        modalList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
     }
 }
 
@@ -813,7 +813,7 @@ closeScoresBtn.addEventListener('click', () => {
 
     function updatePlayerListDisplay() {
         const players = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-        scoresList.innerHTML = players.map(p => <li>${p.name} — ${p.score} pts</li>).join("");
+        scoresList.innerHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
     }
 
     toggleScoresBtn.addEventListener('click', () => {
