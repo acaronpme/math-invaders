@@ -314,7 +314,8 @@
     </div>
 
     <script>
-const gameState = {
+  // État du jeu
+  const gameState = {
     score: 0,
     combo: 0,
     correctInRow: 0,
@@ -333,9 +334,10 @@ const gameState = {
     gameTimeout: null,
     selectedTable: "all",
     selectedOperation: "multiplication"
-};
+  };
 
-const elements = {
+  // Récupération des éléments DOM
+  const elements = {
     gameContainer: document.querySelector('.game-container'),
     invaderContainer: document.getElementById('invader-container'),
     feedbackContainer: document.getElementById('feedback-container'),
@@ -356,13 +358,16 @@ const elements = {
     saveSettingsBtn: document.getElementById('save-settings-btn'),
     tableBtns: document.querySelectorAll('.table-btn'),
     operationBtns: document.querySelectorAll('.operation-btn'),
+    // scores
     toggleScoresBtn: document.getElementById('toggle-scores-btn'),
     scoreModal: document.getElementById('score-modal'),
+    scoresList: document.getElementById('scores-list'),
     closeScoresBtn: document.getElementById('close-scores-btn'),
-    scoresList: document.getElementById('scores-list')
-};
+    sessionSummary: document.getElementById('player-list')
+  };
 
-function initGame() {
+  // Démarre une nouvelle partie
+  function initGame() {
     gameState.score = 0;
     gameState.combo = 0;
     gameState.correctInRow = 0;
@@ -370,8 +375,8 @@ function initGame() {
     gameState.timeLeft = gameState.maxTime;
     gameState.invaderPosition = 0;
 
-    elements.scoreDisplay.textContent = `SCORE: ${gameState.score}`;
-    elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
+    elements.scoreDisplay.textContent = `SCORE: 0`;
+    elements.comboDisplay.textContent = `COMBO: 0`;
     elements.answerInput.value = '';
     elements.answerInput.disabled = false;
     elements.submitBtn.disabled = false;
@@ -382,148 +387,156 @@ function initGame() {
     startTimer();
 
     gameState.gameTimeout = setTimeout(endGame, gameState.gameDuration);
-}
+  }
 
-function generateNewProblem() {
-    if (gameState.invaderElement) gameState.invaderElement.remove();
-
-    let a, b, problem, answer;
-
-    switch (gameState.selectedOperation) {
-        case "multiplication":
-            a = gameState.selectedTable !== "all" ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
-            b = Math.floor(Math.random() * 12) + 1;
-            answer = a * b;
-            problem = `${a} × ${b}`;
-            break;
-        case "addition":
-            a = gameState.selectedTable !== "all" ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
-            b = Math.floor(Math.random() * 20) + 1;
-            answer = a + b;
-            problem = `${a} + ${b}`;
-            break;
-        case "soustraction":
-            a = Math.floor(Math.random() * 20) + 1;
-            b = gameState.selectedTable !== "all" ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 20) + 1;
-            if (b > a) [a, b] = [b, a];
-            answer = a - b;
-            problem = `${a} − ${b}`;
-            break;
-        case "division":
-            b = gameState.selectedTable !== "all" ? parseInt(gameState.selectedTable) : Math.floor(Math.random() * 9) + 2;
-            answer = Math.floor(Math.random() * 12) + 1;
-            a = b * answer;
-            problem = `${a} ÷ ${b}`;
-            break;
+  // Génère une nouvelle opération
+  function generateNewProblem() {
+    if (gameState.invaderElement) {
+      gameState.invaderElement.remove();
+      gameState.invaderElement = null;
     }
-
+    let a, b, problem, answer;
+    switch (gameState.selectedOperation) {
+      case "multiplication":
+        a = gameState.selectedTable !== "all"
+          ? +gameState.selectedTable
+          : Math.floor(Math.random()*9)+2;
+        b = Math.floor(Math.random()*12)+1;
+        problem = `${a} × ${b}`;
+        answer = a*b;
+        break;
+      case "addition":
+        a = gameState.selectedTable !== "all"
+          ? +gameState.selectedTable
+          : Math.floor(Math.random()*20)+1;
+        b = Math.floor(Math.random()*20)+1;
+        problem = `${a} + ${b}`;
+        answer = a+b;
+        break;
+      case "soustraction":
+        a = Math.floor(Math.random()*20)+1;
+        b = gameState.selectedTable !== "all"
+          ? +gameState.selectedTable
+          : Math.floor(Math.random()*20)+1;
+        if (b>a)[a,b]=[b,a];
+        problem = `${a} − ${b}`;
+        answer = a-b;
+        break;
+      case "division":
+        b = gameState.selectedTable !== "all"
+          ? +gameState.selectedTable
+          : Math.floor(Math.random()*9)+2;
+        answer = Math.floor(Math.random()*12)+1;
+        a = b*answer;
+        problem = `${a} ÷ ${b}`;
+        break;
+    }
     gameState.currentProblem = problem;
     gameState.currentAnswer = answer;
 
+    // Création du vaisseau
     const invader = document.createElement("div");
     invader.className = "invader";
     const maxLeft = elements.gameContainer.offsetWidth - 260;
-    invader.style.left = `${Math.floor(Math.random() * maxLeft)}px`;
+    invader.style.left = `${Math.random()*maxLeft}px`;
     invader.style.top = "0px";
 
-    invader.innerHTML = `
-        <div class="spaceship-body">
-            <div class="spaceship-cockpit">${problem}</div>
-            <div class="spaceship-wings">
-                <div class="wing wing-left"></div>
-                <div class="wing wing-right"></div>
-            </div>
-            <div class="spaceship-engine"></div>
-        </div>
-    `;
-    elements.invaderContainer.appendChild(invader);
+    const ship = document.createElement("div");
+    ship.className = "spaceship-body";
+    const cockpit = document.createElement("div");
+    cockpit.className = "spaceship-cockpit";
+    cockpit.textContent = problem;
+    ship.append(cockpit);
+    const wings = document.createElement("div");
+    wings.className = "spaceship-wings";
+    wings.innerHTML = `<div class="wing wing-left"></div><div class="wing wing-right"></div>`;
+    ship.append(wings);
+    ship.append(document.createElement("div")).className = "spaceship-engine";
+
+    invader.append(ship);
+    elements.invaderContainer.append(invader);
+
     gameState.invaderElement = invader;
     gameState.invaderPosition = 0;
     gameState.timeLeft = gameState.maxTime;
     updateTimerDisplay();
-}
+  }
 
-function startTimer() {
+  // Lance le timer du vaisseau
+  function startTimer() {
     clearInterval(gameState.timerInterval);
     gameState.timerInterval = setInterval(() => {
-        gameState.timeLeft -= 0.1;
-        updateTimerDisplay();
-        gameState.invaderPosition += gameState.invaderSpeed;
-        if (gameState.invaderElement) {
-            gameState.invaderElement.style.top = `${gameState.invaderPosition}px`;
-        }
-        if (gameState.timeLeft <= 0 || gameState.invaderPosition >= gameState.maxInvaderPosition) {
-            clearInterval(gameState.timerInterval);
-            handleIncorrectAnswer();
-        }
+      gameState.timeLeft -= 0.1;
+      updateTimerDisplay();
+      gameState.invaderPosition += gameState.invaderSpeed;
+      gameState.invaderElement.style.top = `${gameState.invaderPosition}px`;
+      if (gameState.timeLeft<=0 || gameState.invaderPosition>=gameState.maxInvaderPosition) {
+        clearInterval(gameState.timerInterval);
+        handleIncorrectAnswer();
+      }
     }, 100);
-}
+  }
 
-function updateTimerDisplay() {
-    const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
-    elements.timerBar.style.width = `${percentage}%`;
-    elements.timerBar.className = `timer-bar ${
-        percentage > 50 ? 'bg-green-500' : percentage > 20 ? 'bg-yellow-500' : 'bg-red-500'
-    }`;
-}
+  // Met à jour la barre de temps
+  function updateTimerDisplay() {
+    const pct = (gameState.timeLeft/gameState.maxTime)*100;
+    elements.timerBar.style.width = `${pct}%`;
+    elements.timerBar.className = 'timer-bar ' +
+      (pct>50?'bg-green-500':pct>20?'bg-yellow-500':'bg-red-500');
+  }
 
-function handleCorrectAnswer() {
+  // Bonne réponse
+  function handleCorrectAnswer() {
     clearInterval(gameState.timerInterval);
-    let points = gameState.timeLeft >= 7 ? 10 : gameState.timeLeft >= 4 ? 7 : 5;
+    let pts = gameState.timeLeft>=7?10:gameState.timeLeft>=4?7:5;
     gameState.correctInRow++;
-    if (gameState.correctInRow % 3 === 0) {
-        points += 5;
-        gameState.combo++;
+    if (gameState.correctInRow%3===0) {
+      pts+=5;
+      gameState.combo++;
+      elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
     }
-    gameState.score += points;
+    gameState.score+=pts;
     elements.scoreDisplay.textContent = `SCORE: ${gameState.score}`;
-    elements.comboDisplay.textContent = `COMBO: ${gameState.combo}`;
     createExplosion();
-    showFeedback(["SUPER !", "GÉNIAL !", "BIEN JOUÉ !", "EXCELLENT !", "PARFAIT !", "FORMIDABLE !", "BRAVO !", "INCROYABLE !"][Math.floor(Math.random() * 8)]);
-    setTimeout(() => {
-        if (gameState.gameActive) {
-            generateNewProblem();
-            startTimer();
-        }
-    }, 1000);
-}
+    showFeedback(["SUPER","GÉNIAL","BIEN JOUÉ","EXCELLENT","PARFAIT"][Math.floor(Math.random()*5)]);
+    setTimeout(()=>{ if(gameState.gameActive){ generateNewProblem(); startTimer(); } }, 800);
+  }
 
-function handleIncorrectAnswer() {
+  // Mauvaise réponse
+  function handleIncorrectAnswer() {
     clearInterval(gameState.timerInterval);
     gameState.correctInRow = 0;
     gameState.combo = 0;
     elements.comboDisplay.textContent = `COMBO: 0`;
     if (gameState.invaderElement) gameState.invaderElement.remove();
     showFeedback(`${gameState.currentProblem} = ${gameState.currentAnswer}`);
-    setTimeout(() => {
-        if (gameState.gameActive) {
-            generateNewProblem();
-            startTimer();
-        }
-    }, 2000);
-}
+    setTimeout(()=>{ if(gameState.gameActive){ generateNewProblem(); startTimer(); } }, 1200);
+  }
 
-function createExplosion() {
+  // Explosion
+  function createExplosion() {
     if (gameState.explosionElement) gameState.explosionElement.remove();
-    const explosion = document.createElement('div');
-    explosion.className = 'explosion';
-    explosion.style.left = gameState.invaderElement?.style.left || '0px';
-    explosion.style.top = gameState.invaderElement?.style.top || '0px';
-    elements.invaderContainer.appendChild(explosion);
-    gameState.invaderElement?.remove();
-    gameState.explosionElement = explosion;
-    setTimeout(() => explosion.remove(), 500);
-}
+    const e = document.createElement('div');
+    e.className='explosion';
+    e.style.left=gameState.invaderElement.style.left;
+    e.style.top=gameState.invaderElement.style.top;
+    elements.invaderContainer.append(e);
+    gameState.invaderElement.remove();
+    gameState.explosionElement=e;
+    setTimeout(()=>e.remove(),500);
+  }
 
-function showFeedback(message) {
-    const div = document.createElement('div');
-    div.className = 'feedback-message';
-    div.textContent = message;
-    elements.feedbackContainer.appendChild(div);
-    setTimeout(() => div.remove(), 2000);
-}
+  // Feedback texte
+  function showFeedback(msg) {
+    const f = document.createElement('div');
+    f.className='feedback-message';
+    f.textContent=msg;
+    elements.feedbackContainer.append(f);
+    setTimeout(()=>f.remove(),1800);
+  }
 
-function endGame() {
+  // Fin de la partie
+  function endGame() {
     gameState.gameActive = false;
     clearInterval(gameState.timerInterval);
     clearTimeout(gameState.gameTimeout);
@@ -534,78 +547,86 @@ function endGame() {
     elements.startBtn.classList.remove('hidden');
     elements.finalScore.textContent = gameState.score;
     elements.gameOverModal.classList.remove('hidden');
-}
+  }
 
-function updatePlayerListDisplay() {
-    const players = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-    const listHTML = players.map(p => `<li>${p.name} — ${p.score} pts</li>`).join("");
-    document.getElementById("player-list").innerHTML = players.length ? `<h3 class="text-lg text-yellow-400 mb-2">Scores de cette session</h3><ul>${listHTML}</ul>` : '';
-    elements.scoresList.innerHTML = listHTML;
-}
+  function stopGame() {
+    if (confirm("Arrêter la partie ? Score perdu.")) endGame();
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
+  function openSettings()  { elements.settingsPanel.classList.add('active'); }
+  function closeSettings() { elements.settingsPanel.classList.remove('active'); }
+
+  function saveSettings() {
+    gameState.selectedTable     = document.querySelector('.table-btn.selected')?.dataset.table     || "all";
+    gameState.selectedOperation = document.querySelector('.operation-btn.selected')?.dataset.operation || "multiplication";
+    closeSettings();
+    if (gameState.gameActive) { generateNewProblem(); startTimer(); }
+  }
+
+  // Affiche/Cache la modale des scores
+  function updatePlayerListDisplay() {
+    const arr = JSON.parse(sessionStorage.getItem("sessionPlayers")||"[]");
+    // résumé au-dessus du jeu
+    if (elements.sessionSummary) {
+      elements.sessionSummary.innerHTML = arr.length
+        ? `<h3 class="text-yellow-400 mb-2">Scores session</h3><ul>${arr.map(p=>`<li>${p.name}: ${p.score}`)}</ul>`
+        : '';
+    }
+    // liste détaillée
+    elements.scoresList.innerHTML = arr.map(p=>`<li>${p.name} — ${p.score} pts</li>`).join("");
+  }
+
+  // Au chargement
+  document.addEventListener("DOMContentLoaded", ()=>{
     updatePlayerListDisplay();
-
-    elements.startBtn.addEventListener('click', initGame);
-    elements.submitBtn.addEventListener('click', () => {
-        if (!gameState.gameActive) return;
-        const userAnswer = parseInt(elements.answerInput.value);
-        if (!isNaN(userAnswer)) {
-            (userAnswer === gameState.currentAnswer) ? handleCorrectAnswer() : handleIncorrectAnswer();
-            elements.answerInput.value = '';
-            elements.answerInput.focus();
-        }
+    // Démarrer / contrôle du jeu
+    elements.startBtn     .addEventListener('click', initGame);
+    elements.submitBtn    .addEventListener('click', ()=>{ if(gameState.gameActive){
+      const ans=+elements.answerInput.value;
+      ans===gameState.currentAnswer?handleCorrectAnswer():handleIncorrectAnswer();
+      elements.answerInput.value=''; elements.answerInput.focus();
+    }});
+    elements.answerInput  .addEventListener('keypress', e=>{ if(e.key==='Enter') elements.submitBtn.click(); });
+    elements.stopBtn      .addEventListener('click', stopGame);
+    elements.playAgainBtn .addEventListener('click', ()=>elements.gameOverModal.classList.add('hidden'));
+    elements.scoreForm    .addEventListener('submit', e=>{
+      e.preventDefault();
+      const name=elements.playerName.value.trim();
+      if(!name) return;
+      let arr=JSON.parse(sessionStorage.getItem("sessionPlayers")||"[]");
+      arr.push({ name, score: gameState.score });
+      sessionStorage.setItem("sessionPlayers", JSON.stringify(arr));
+      updatePlayerListDisplay();
+      elements.scoreForm.querySelector('button').textContent='Enregistré !';
+      setTimeout(()=>{
+        elements.gameOverModal.classList.add('hidden');
+        elements.playerName.value='';
+        elements.scoreForm.querySelector('button').textContent='Envoyer le score';
+      },800);
     });
-    elements.answerInput.addEventListener('keypress', e => { if (e.key === 'Enter') elements.submitBtn.click(); });
-    elements.stopBtn.addEventListener('click', stopGame);
-    elements.playAgainBtn.addEventListener('click', () => { elements.gameOverModal.classList.add('hidden'); initGame(); });
-
-    elements.scoreForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = elements.playerName.value.trim();
-        if (!name) return;
-        const btn = elements.scoreForm.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Enregistrement...';
-        const scores = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
-        scores.push({ name, score: gameState.score });
-        sessionStorage.setItem("sessionPlayers", JSON.stringify(scores));
-        updatePlayerListDisplay();
-        setTimeout(() => {
-            elements.gameOverModal.classList.add('hidden');
-            elements.playerName.value = '';
-            btn.disabled = false;
-            btn.textContent = 'Envoyer le score';
-        }, 1000);
-    });
-
-    elements.settingsBtn.addEventListener('click', openSettings);
+    elements.settingsBtn .addEventListener('click', openSettings);
     elements.saveSettingsBtn.addEventListener('click', saveSettings);
-
-    elements.tableBtns.forEach(btn => btn.addEventListener('click', () => {
-        elements.tableBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        gameState.selectedTable = btn.dataset.table;
+    elements.tableBtns.forEach(b=>b.addEventListener('click', ()=>{
+      elements.tableBtns.forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
     }));
-
-    elements.operationBtns.forEach(btn => btn.addEventListener('click', () => {
-        elements.operationBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        gameState.selectedOperation = btn.dataset.operation;
+    elements.operationBtns.forEach(b=>b.addEventListener('click', ()=>{
+      elements.operationBtns.forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
     }));
-
-    elements.toggleScoresBtn.addEventListener('click', () => {
-        const visible = !elements.scoreModal.classList.contains('hidden');
-        elements.scoreModal.classList.toggle('hidden', visible);
-        elements.toggleScoresBtn.textContent = visible ? "VOIR SCORES" : "MASQUER SCORES";
+    elements.toggleScoresBtn.addEventListener('click', ()=>{
+      const showing = !elements.scoreModal.classList.contains('hidden');
+      elements.scoreModal.classList.toggle('hidden');
+      elements.toggleScoresBtn.textContent = showing ? "VOIR SCORES" : "MASQUER SCORES";
+      if (!showing) updatePlayerListDisplay();
     });
-
-    elements.closeScoresBtn.addEventListener('click', () => {
-        elements.scoreModal.classList.add('hidden');
-        elements.toggleScoresBtn.textContent = "VOIR SCORES";
+    elements.closeScoresBtn.addEventListener('click', ()=>{
+      elements.scoreModal.classList.add('hidden');
+      elements.toggleScoresBtn.textContent="VOIR SCORES";
     });
-});
+  });
 </script>
+
 
     <div id="score-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
     <div class="bg-gray-800 border-4 border-green-500 p-6 max-w-md w-full text-white">
