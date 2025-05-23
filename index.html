@@ -765,11 +765,11 @@
             });
             
             // Update quick summary (top of game)
-            const topScores = scores.slice( 0, 3 );
+            const topScores = scores.slice( 0, 1 );
             if (topScores.length > 0) {
                 const summary = document.createElement('div');
                 summary.innerHTML = `
-                    <h3 class="text-lg text-yellow-400 mb-2">Meilleurs scores</h3>
+                    <h3 class="text-lg text-yellow-400 mb-2">Meilleur score</h3>
                     <ul class="text-sm">
                         ${topScores.map((p, i) => `<li>${i + 1}. ${p.name} - ${p.score} pts</li>`).join('')}
                     </ul>
