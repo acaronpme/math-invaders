@@ -207,7 +207,7 @@
         <h1 class="text-2xl md:text-3xl retro-text mb-2">ENVAHISSEURS MATHÉMATIQUES</h1>
         <p class="text-lg retro-text">Détruisez les vaisseaux en résolvant des calculs !</p>
     </div>
-    <div id="player-list" class="text-sm text-green-400 mb-4 text-center"></div>
+   
     <div class="game-container pixel-border relative">
         <div id="score-display" class="absolute top-4 left-4 text-xl retro-text">SCORE: 0</div>
         <div id="combo-display" class="combo-display">COMBO: 0</div>
@@ -564,17 +564,20 @@
   }
 
   // Affiche/Cache la modale des scores
-  function updatePlayerListDisplay() {
-    const arr = JSON.parse(sessionStorage.getItem("sessionPlayers")||"[]");
-    // résumé au-dessus du jeu
-    if (elements.sessionSummary) {
-      elements.sessionSummary.innerHTML = arr.length
-        ? `<h3 class="text-yellow-400 mb-2">Scores session</h3><ul>${arr.map(p=>`<li>${p.name}: ${p.score}`)}</ul>`
-        : '';
-    }
-    // liste détaillée
-    elements.scoresList.innerHTML = arr.map(p=>`<li>${p.name} — ${p.score} pts</li>`).join("");
-  }
+ function updatePlayerListDisplay() {
+  const arr = JSON.parse(sessionStorage.getItem("sessionPlayers") || "[]");
+  
+  // Si vous ne voulez plus jamais afficher le résumé au-dessus,
+  // supprimez ou commentez entièrement ce bloc :
+  // if (elements.sessionSummary) {
+  //   elements.sessionSummary.innerHTML = '';
+  // }
+
+  // Mise à jour de la liste dans la modale
+  elements.scoresList.innerHTML = arr
+    .map(p => `<li>${p.name} — ${p.score} pts</li>`)
+    .join("");
+}
 
   // Au chargement
   document.addEventListener("DOMContentLoaded", ()=>{
